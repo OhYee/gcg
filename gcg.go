@@ -10,6 +10,11 @@ import (
 	"text/template"
 )
 
+const (
+	version  = "0.0.2"
+	helpText = "Using `gcg <json file> [<output file>]` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`"
+)
+
 type arguments struct {
 	PackageName     string        `json:"package"`
 	ImportedPackage []interface{} `json:"import"`
@@ -79,8 +84,13 @@ func main() {
 	var outputFile *os.File
 	switch len(os.Args) {
 	case 1:
-		exitWhenFalse(false, "Using `gcg <json file> [<output file>]` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`")
+		exitWhenFalse(false, helpText)
 	case 2:
+		if os.Args[1] == "-h" || os.Args[1] == "--help" {
+			exitWhenFalse(false, helpText)
+		} else if os.Args[1] == "-v" || os.Args[1] == "--version" {
+			exitWhenFalse(false, fmt.Sprintf("Go Code Generator version: %s\n", version))
+		}
 		inputFile = os.Args[1]
 		outputFile = os.Stdout
 	default:
