@@ -7,6 +7,7 @@ import (
 	"go/format"
 	"io/ioutil"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -22,7 +23,6 @@ const (
 //go:generate bash -c "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/gcg gcg.go"
 //go:generate bash -c "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/gcg.exe gcg.go"
 //go:generate bash -c "CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/gcg_x86.exe gcg.go"
-
 
 type arguments struct {
 	PackageName     string        `json:"package"`
@@ -145,7 +145,19 @@ func main() {
 			exitWhenFalse(false, "template must be string or []string")
 		}
 
-		tpl, err := template.ParseFiles(templates...)
+		tpl, err := template.New(templates[0]).Funcs(
+			template.FuncMap{
+				"upperFirstChar": func(text string) string {
+					return strings.ToTitle(text)
+				},
+				"upper": func(text string) string {
+					return strings.ToUpper(text)
+				},
+				"lower": func(text string) string {
+					return strings.ToLower(text)
+				},
+			},
+		).ParseFiles(templates...)
 		exitWhenError(err)
 		for _, arg := range block.Args {
 			tpl.Execute(buf, arg)
