@@ -1,9 +1,0 @@
-#!/bin/sh
-# CGO_ENABLED: 0
-# GOOS: darwin、freebsd、linux、windows
-# GOARCH: 386、amd64、arm
-
-go build -o bin/gcg gcg.go
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/gcg.exe gcg.go
-CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/gcg_x86.exe gcg.go
-

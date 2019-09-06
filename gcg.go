@@ -15,6 +15,15 @@ const (
 	helpText = "Using `gcg <json file> [<output file>]` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`"
 )
 
+// CGO_ENABLED: 0
+// GOOS: darwin、freebsd、linux、windows
+// GOARCH: 386、amd64、arm
+//
+//go:generate bash -c "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/gcg gcg.go"
+//go:generate bash -c "CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/gcg.exe gcg.go"
+//go:generate bash -c "CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/gcg_x86.exe gcg.go"
+
+
 type arguments struct {
 	PackageName     string        `json:"package"`
 	ImportedPackage []interface{} `json:"import"`
