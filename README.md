@@ -1,6 +1,15 @@
 # Go Code Generator
 
+[English](/README.md) | [中文](/README_CN.md)
+
 Using json file and go template to generate go code.
+
+## Installation
+
+```
+go get github.com/OhYee/gcg
+go install github.com/OhYee/gcg
+```
 
 ## Usage
 

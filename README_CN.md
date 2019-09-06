@@ -1,6 +1,15 @@
 # Go 代码生成器
 
+[English](/README.md) | [中文](/README_CN.md)
+
 使用 JSON 文件以及 Go 模板生成 Go 源码文件
+
+## 安装
+
+```
+go get github.com/OhYee/gcg
+go install github.com/OhYee/gcg
+```
 
 ## 使用
 
