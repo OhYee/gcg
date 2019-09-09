@@ -22,12 +22,20 @@ gcg data.json compare.go
 JSON文件字段要求
 
 |名称|类型||
-|:---:|:---:|:---:|
+|:---|:---|:---|
 |package|string|生成文件的包名|
 |import|`[]string` or `[][]string`|Go文件的引入包部分|
 |body|`[]strut{template string, args interface{}}` or `[]struct{template []string, args interface{}}`|Go文件主体|
 
 `body`的`template` 和 `args` 将用于 Go `text/template` 的参数
+
+### 函数
+
+|名称|参数||
+|:---|:---|:---|
+|lower|`string`|使所有字母小写|
+|upper|`string`|使所有字母大写|
+|upperFirstChar|`string`|使首字母大写|
 
 ## 样例
 

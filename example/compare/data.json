@@ -10,7 +10,7 @@
     ],
     "body": [
         {
-            "template": "const.tpl",
+            "template": "/home/ohyee/projects/gcg/example/compare/const.tpl",
             "args": ["-"]
         },
         {

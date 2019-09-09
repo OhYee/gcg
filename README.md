@@ -6,28 +6,36 @@ Using json file and go template to generate go code.
 
 ## Installation
 
-```
+```bash
 go get github.com/OhYee/gcg
 go install github.com/OhYee/gcg
 ```
 
 ## Usage
 
-```
+```bash
 gcg data.json compare.go
 ```
 
-## document
+## Document
 
 The json file must have these field:
 
 |name|type||
-|:---:|:---:|:---:|
+|:---|:---|:---|
 |package|string|package name|
 |import|`[]string` or `[][]string`|import part of the file|
 |body|`[]strut{template string, args interface{}}` or `[]struct{template []string, args interface{}}`|the go file body|
 
 The `template` and `args` in `body` will be the arguments of go `text/template`
+
+### Function
+
+|name|args||
+|:---|:---|:---|
+|lower|`string`|make all letters to their lower case|
+|upper|`string`|make all letters to their upper case|
+|upperFirstChar|`string`|make the first letter to its upper case, keep others|
 
 ## Example
 
