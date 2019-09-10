@@ -1,5 +1,7 @@
 # Go Code Generator
 
+![test state](https://github.com/OhYee/gcg/workflows/test/badge.svg)
+
 [English](/README.md) | [中文](/README_CN.md)
 
 Using json file and go template to generate go code.
