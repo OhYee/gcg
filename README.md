@@ -38,6 +38,16 @@ The `template` and `args` in `body` will be the arguments of go `text/template`
 |lower|`string`|make all letters to their lower case|
 |upper|`string`|make all letters to their upper case|
 |upperFirstChar|`string`|make the first letter to its upper case, keep others|
+|makeSlice|`[]interface{}`|concat arguments as slice|
+|makeMap|`[]interface{}`|concat arguments as map|
+|isInt|`interface{}`|judge argument is int|
+|isString|`interface{}`|judge argument is string|
+|isSlice|`interface{}`|judge argument is slice|
+|isArray|`interface{}`|judge argument is array|
+|isMap|`interface{}`|judge argument is map|
+|isList|`interface{}`|judge argument is slice or array|
+|isNumber|`interface{}`|judge argument is int or float|
+|isFloat|`interface{}`|judge argument is float|
 
 ## Example
 

@@ -38,6 +38,16 @@ JSON文件字段要求
 |lower|`string`|使所有字母小写|
 |upper|`string`|使所有字母大写|
 |upperFirstChar|`string`|使首字母大写|
+|makeSlice|`[]interface{}`|将参数拼接成slice|
+|makeMap|`[]interface{}`|将参数拼接成map|
+|isInt|`interface{}`|判断参数是否为int|
+|isString|`interface{}`|判断参数是否为string|
+|isSlice|`interface{}`|判断参数是否为slice|
+|isArray|`interface{}`|判断参数是否为array|
+|isMap|`interface{}`|判断参数是否为map|
+|isList|`interface{}`|判断参数是否为slice或array|
+|isNumber|`interface{}`|判断参数是否为int或float|
+|isFloat|`interface{}`|判断参数是否为float|
 
 ## 样例
 

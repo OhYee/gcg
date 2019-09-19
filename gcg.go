@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version  = "0.0.3"
+	version  = "0.0.4"
 	helpText = "Using `gcg <json file> [<output file>]` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`"
 )
 
