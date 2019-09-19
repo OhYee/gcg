@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 	"text/template"
 )
@@ -45,6 +46,81 @@ var funcMap = template.FuncMap{
 	},
 	"lower": func(text string) string {
 		return strings.ToLower(text)
+	},
+	"makeSlice": func(args ...interface{}) (slice []interface{}) {
+		for _, arg := range args {
+			slice = append(slice, arg)
+		}
+		return
+	},
+	"makeMap": func(args ...interface{}) (m map[interface{}]interface{}) {
+		m = make(map[interface{}]interface{})
+		for i := 0; i < len(args)/2; i++ {
+			m[args[i*2]] = args[i*2+1]
+		}
+		return
+	},
+	"isInt": func(i interface{}) bool {
+		v := reflect.ValueOf(i)
+		switch v.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint32, reflect.Uint64:
+			return true
+		default:
+			return false
+		}
+	},
+	"isString": func(i interface{}) bool {
+		v := reflect.ValueOf(i)
+		switch v.Kind() {
+		case reflect.String:
+			return true
+		default:
+			return false
+		}
+	},
+	"isSlice": func(i interface{}) bool {
+		v := reflect.ValueOf(i)
+		switch v.Kind() {
+		case reflect.Slice:
+			return true
+		default:
+			return false
+		}
+	},
+	"isArray": func(i interface{}) bool {
+		v := reflect.ValueOf(i)
+		switch v.Kind() {
+		case reflect.Array:
+			return true
+		default:
+			return false
+		}
+	},
+	"isMap": func(i interface{}) bool {
+		v := reflect.ValueOf(i)
+		switch v.Kind() {
+		case reflect.Map:
+			return true
+		default:
+			return false
+		}
+	},
+	"isList": func(i interface{}) bool {
+		v := reflect.ValueOf(i).Kind()
+		return v == reflect.Array || v == reflect.Slice
+	},
+	"isNumber": func(i interface{}) bool {
+		v := reflect.ValueOf(i).Kind()
+		switch v {
+		case reflect.Int, reflect.Int8, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
+			return true
+		default:
+			return false
+		}
+	},
+	"isFloat": func(i interface{}) bool {
+		v := reflect.ValueOf(i).Kind()
+		return v == reflect.Float32 || v == reflect.Float64
 	},
 }
 
@@ -115,8 +191,9 @@ func renderTemplate(buf io.Writer, templates []string, args []interface{}) {
 	exitWhenError(err)
 	for _, arg := range args {
 		// tpl.Execute(buf, arg)
-		tpl.ExecuteTemplate(buf, templateName, arg)
-		buf.Write([]byte{'\n'})
+		err = tpl.ExecuteTemplate(buf, templateName, arg)
+		exitWhenError(err)
+		// buf.Write([]byte{'\n'})
 	}
 }
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -21,12 +22,13 @@ func writeToTempFile(t *testing.T, content string) string {
 }
 
 func Test_renderTemplate(t *testing.T) {
-	tests := []struct {
+	type testCase struct {
 		name     string
 		template string
 		args     []interface{}
 		result   string
-	}{
+	}
+	tests := []testCase{
 		{
 			name:     "test upper",
 			template: "{{upper .text}}",
@@ -35,7 +37,7 @@ func Test_renderTemplate(t *testing.T) {
 					"text": "ABcdefg1234567",
 				},
 			},
-			result: "ABCDEFG1234567\n",
+			result: "ABCDEFG1234567",
 		},
 		{
 			name:     "test lower",
@@ -45,7 +47,7 @@ func Test_renderTemplate(t *testing.T) {
 					"text": "ABcdefg1234567",
 				},
 			},
-			result: "abcdefg1234567\n",
+			result: "abcdefg1234567",
 		},
 		{
 			name:     "test upperFirstChar",
@@ -55,7 +57,7 @@ func Test_renderTemplate(t *testing.T) {
 					"text": "ABcdefg1234567",
 				},
 			},
-			result: "ABcdefg1234567\n",
+			result: "ABcdefg1234567",
 		},
 		{
 			name:     "test upperFirstChar 2",
@@ -65,8 +67,55 @@ func Test_renderTemplate(t *testing.T) {
 					"text": "abc",
 				},
 			},
-			result: "Abc\n",
+			result: "Abc",
 		},
+		{
+			name:     "test makeSlice",
+			template: "{{$slice := makeSlice .a .b .c}}{{range $item := $slice}}{{$item}}{{end}}",
+			args: []interface{}{
+				map[string]interface{}{
+					"a": "A", "b": "B", "c": "C",
+				},
+			},
+			result: "ABC",
+		},
+		{
+			name:     "test makeMap",
+			template: "{{$map := makeMap .c .b .a  }}{{$map.C}}",
+			args: []interface{}{
+				map[string]interface{}{
+					"a": "A", "b": "B", "c": "C",
+				},
+			},
+			result: "B",
+		},
+	}
+
+	martix := [7][9]interface{}{
+		{"", "isInt", "isString", "isSlice", "isArray", "isMap", "isList", "isNumber", "isFloat"},
+		{1, true, false, false, false, false, false, true, false},
+		{"This is string", false, true, false, false, false, false, false, false},
+		{make([]string, 3), false, false, true, false, false, true, false, false},
+		{[2]string{"a", "b"}, false, false, false, true, false, true, false, false},
+		{map[string]string{"A": "a"}, false, false, false, false, true, false, false, false},
+		{0.7, false, false, false, false, false, false, true, true},
+	}
+
+	for i := 1; i < len(martix); i++ {
+		value := martix[i][0]
+		for j := 1; j < len(martix[i]); j++ {
+			f := martix[0][j]
+			r := "FALSE"
+			if martix[i][j] == true {
+				r = "TRUE"
+			}
+			tests = append(tests, testCase{
+				name:     fmt.Sprintf("test %s with %v", f, value),
+				template: fmt.Sprintf("{{if %s .}}TRUE{{else}}FALSE{{end}}", f),
+				args:     []interface{}{value},
+				result:   r,
+			})
+		}
 	}
 
 	buf := bytes.NewBuffer([]byte{})
@@ -76,9 +125,10 @@ func Test_renderTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			renderTemplate(buf, []string{filename}, tt.args)
 			if buf.String() != tt.result {
-				t.Errorf("want %v, but got %v", tt.result, buf.String())
+				t.Errorf("want %v, but got %v.", tt.result, buf.String())
 			}
 		})
 		os.Remove(filename)
 	}
+
 }
