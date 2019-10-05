@@ -1,6 +1,6 @@
 package compare
 
-//go:generate echo generate compare.go
-//go:generate ../../bin/gcg data.json compare.go
+//go:generate echo generate compare package
+//go:generate gcg data.json
 
 func otherCodeOfThePackage(){}
