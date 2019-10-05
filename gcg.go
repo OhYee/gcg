@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version  = "0.0.4"
+	version  = "0.0.5"
 	helpText = "Using `gcg <json file> [<output file>]` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`"
 )
 
@@ -27,9 +27,10 @@ const (
 //go:generate bash -c "CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/gcg_x86.exe gcg.go"
 
 type arguments struct {
-	PackageName     string        `json:"package"`
-	ImportedPackage []interface{} `json:"import"`
-	Body            []bodyArea    `json:"body"`
+	PackageName     string                 `json:"package"`
+	Variable        map[string]interface{} `json:"variable"`
+	ImportedPackage []interface{}          `json:"import"`
+	Body            []bodyArea             `json:"body"`
 }
 type bodyArea struct {
 	Template interface{}   `json:"template"`
@@ -185,13 +186,23 @@ func getFileName(path string) (filename string) {
 }
 
 // renderTemplate render the block template
-func renderTemplate(buf io.Writer, templates []string, args []interface{}) {
+func renderTemplate(buf io.Writer, templates []string, args []interface{}, variable map[string]interface{}) {
 	templateName := getFileName(templates[0])
 	tpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(templates...)
 	exitWhenError(err)
 	for _, arg := range args {
 		// tpl.Execute(buf, arg)
-		err = tpl.ExecuteTemplate(buf, templateName, arg)
+
+		var temp interface{}
+		s, ok := arg.(string)
+		if ok {
+			temp, ok = variable[s]
+		}
+		if !ok {
+			temp = arg
+		}
+
+		err = tpl.ExecuteTemplate(buf, templateName, temp)
 		exitWhenError(err)
 		// buf.Write([]byte{'\n'})
 	}
@@ -235,7 +246,7 @@ func renderContent(args arguments) []byte {
 		default:
 			exitWhenFalse(false, "template must be string or []string")
 		}
-		renderTemplate(buf, templates, block.Args)
+		renderTemplate(buf, templates, block.Args, args.Variable)
 	}
 
 	// code format
