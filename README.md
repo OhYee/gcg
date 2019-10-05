@@ -9,27 +9,38 @@ Using json file and go template to generate go code.
 ## Installation
 
 ```bash
-go get github.com/OhYee/gcg
+go get -u github.com/OhYee/gcg
 go install github.com/OhYee/gcg
 ```
 
 ## Usage
 
 ```bash
-gcg data.json compare.go
+gcg data.json
 ```
 
 ## Document
 
 The json file must have these field:
 
+
 |name|type||
 |:---|:---|:---|
-|package|string|package name|
+|variable|`map[string]interface{}`|gloable variable|
+|files|`[]goFile`|the list of generated files|
+
+goFile struct like below:
+
+|name|type||
+|:---|:---|:---|
+|package|`string`|package name|
 |import|`[]string` or `[][]string`|import part of the file|
-|body|`[]strut{template string, args interface{}}` or `[]struct{template []string, args interface{}}`|the go file body|
+|output|`string`|the output filename|
+|body|`[]strut{template string, args []interface{}}` or `[]struct{template []string, args []interface{}}`|the go file body|
 
 The `template` and `args` in `body` will be the arguments of go `text/template`
+
+If the item of `args` is `string`, and match `variable`'s key, it will be replaced to the value.
 
 ### Function
 
@@ -51,7 +62,7 @@ The `template` and `args` in `body` will be the arguments of go `text/template`
 
 ## Example
 
-See [number compare package](https://github.com/OhYee/gcg/tree/master/example/compare), you can delete `compare.go` and using `gcg data.json compare.go` or `go generate g.go` to re-generate it.
+See [number compare package](https://github.com/OhYee/gcg/tree/master/example/compare), you can delete `compare.go` and using `gcg data.json` or `go generate g.go` to re-generate it.
 
 ## LICENSE
 
