@@ -123,7 +123,7 @@ func Test_renderTemplate(t *testing.T) {
 		buf.Reset()
 		filename := writeToTempFile(t, tt.template)
 		t.Run(tt.name, func(t *testing.T) {
-			renderTemplate(buf, []string{filename}, tt.args)
+			renderTemplate(buf, []string{filename}, tt.args, map[string]interface{}{})
 			if buf.String() != tt.result {
 				t.Errorf("want %v, but got %v.", tt.result, buf.String())
 			}
