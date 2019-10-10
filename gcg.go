@@ -15,7 +15,7 @@ import (
 
 const (
 	version  = "0.0.5"
-	helpText = "Using `gcg <json file>` to generate go file\nSuch as `gcg data.json` or `gcg data.json ../add.go`"
+	helpText = "Using `gcg <json file>` to generate go file\nSuch as `gcg data.json`"
 )
 
 // CGO_ENABLED: 0
