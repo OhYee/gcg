@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -131,4 +132,64 @@ func Test_renderTemplate(t *testing.T) {
 		os.Remove(filename)
 	}
 
+}
+
+func Test_modifyVariable(t *testing.T) {
+	type args struct {
+		args     interface{}
+		variable map[string]interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want interface{}
+	}{
+		{
+			name: "do nothing",
+			args: args{
+				args:     []interface{}{"a", "b", "c"},
+				variable: map[string]interface{}{},
+			},
+			want: []interface{}{"a", "b", "c"},
+		},
+		{
+			name: "modify direct string",
+			args: args{
+				args:     "$variable",
+				variable: map[string]interface{}{"$variable": []interface{}{"a", "b", "c"}},
+			},
+			want: []interface{}{"a", "b", "c"},
+		},
+		{
+			name: "modify in slice",
+			args: args{
+				args:     []interface{}{"$variable", "variable"},
+				variable: map[string]interface{}{"$variable": []interface{}{"a", "b", "c"}},
+			},
+			want: []interface{}{[]interface{}{"a", "b", "c"}, "variable"},
+		},
+		{
+			name: "modify in map",
+			args: args{
+				args:     map[string]interface{}{"key": "value", "variable": "$variable"},
+				variable: map[string]interface{}{"$variable": []interface{}{"a", "b", "c"}},
+			},
+			want: map[string]interface{}{"key": "value", "variable": []interface{}{"a", "b", "c"}},
+		},
+		{
+			name: "mix",
+			args: args{
+				args:     map[string]interface{}{"key": "value", "variable": []interface{}{"$variable", "variable"}},
+				variable: map[string]interface{}{"$variable": []interface{}{"a", "b", "c"}},
+			},
+			want: map[string]interface{}{"key": "value", "variable": []interface{}{[]interface{}{"a", "b", "c"}, "variable"}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := modifyVariable(tt.args.args, tt.args.variable); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("modifyVariable() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

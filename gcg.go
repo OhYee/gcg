@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version  = "0.0.6"
+	version  = "0.0.7"
 	helpText = "Using `gcg <json file>` to generate go file\nSuch as `gcg data.json`"
 )
 
@@ -41,8 +41,8 @@ type goFile struct {
 }
 
 type bodyArea struct {
-	Template interface{}   `json:"template"`
-	Args     []interface{} `json:"args"`
+	Template interface{} `json:"template"`
+	Args     interface{} `json:"args"`
 }
 type jsonMap = map[string]interface{}
 
@@ -161,7 +161,39 @@ func readData(filename string) (cfg config) {
 
 	filenameSlice := strings.Split(filename, "/")
 	cfg.Root = strings.Join(filenameSlice[0:len(filenameSlice)-1], "/")
+
+	for fileIndex, file := range cfg.Files {
+		for bodyIndex, body := range file.Body {
+			cfg.Files[fileIndex].Body[bodyIndex].Args = modifyVariable(body.Args, cfg.Variable)
+		}
+	}
 	return
+}
+
+func modifyVariable(args interface{}, variable map[string]interface{}) interface{} {
+	switch reflect.TypeOf(args).Kind() {
+	case reflect.String:
+		s, ok := variable[args.(string)]
+		if ok {
+			return s
+		}
+		return args
+	case reflect.Slice:
+		s := make([]interface{}, 0)
+		for _, arg := range args.([]interface{}) {
+			s = append(s, modifyVariable(arg, variable))
+		}
+		return s
+	case reflect.Map:
+		m := make(map[string]interface{})
+		iter := reflect.ValueOf(args).MapRange()
+		for iter.Next() {
+			m[iter.Key().String()] = modifyVariable(iter.Value().Interface(), variable)
+		}
+		return m
+	default:
+		return args
+	}
 }
 
 // importPackage from a string or []string to generator import part
@@ -196,25 +228,22 @@ func getFileName(path string) (filename string) {
 }
 
 // renderTemplate render the block template
-func renderTemplate(buf io.Writer, templates []string, args []interface{}, variable map[string]interface{}) {
+func renderTemplate(buf io.Writer, templates []string, args interface{}, variable map[string]interface{}) {
 	templateName := getFileName(templates[0])
 	tpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(templates...)
 	exitWhenError(err)
-	for _, arg := range args {
-		// tpl.Execute(buf, arg)
 
-		var temp interface{}
-		s, ok := arg.(string)
-		if ok {
-			temp, ok = variable[s]
-		}
-		if !ok {
-			temp = arg
-		}
+	if reflect.TypeOf(args).Kind() == reflect.Slice {
+		argsSlice, _ := args.([]interface{})
+		for _, arg := range argsSlice {
+			// tpl.Execute(buf, arg)
 
-		err = tpl.ExecuteTemplate(buf, templateName, temp)
+			err = tpl.ExecuteTemplate(buf, templateName, arg)
+			exitWhenError(err)
+		}
+	} else {
+		err = tpl.ExecuteTemplate(buf, templateName, args)
 		exitWhenError(err)
-		// buf.Write([]byte{'\n'})
 	}
 }
 
