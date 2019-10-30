@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/format"
+	"gopkg.in/ffmt.v1"
 	"io"
 	"io/ioutil"
 	"os"
@@ -284,6 +285,9 @@ func main() {
 			exitWhenFalse(false, helpText)
 		} else if os.Args[1] == "-v" || os.Args[1] == "--version" {
 			exitWhenFalse(false, fmt.Sprintf("Go Code Generator version: %s\n", version))
+		} else if os.Args[1] == "-d" || os.Args[1] == "--debug" {
+			ffmt.P(readData(os.Args[2]))
+			exitWhenFalse(false, "\n")
 		}
 		inputFile = os.Args[1]
 
