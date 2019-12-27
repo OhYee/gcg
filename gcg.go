@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	version  = "0.0.7"
-	helpText = "Using `gcg <json file>` to generate go file\nSuch as `gcg data.json`"
+	version  = "0.0.8"
+	helpText = "Using `gcg <json file>` to generate go file\nSuch as `gcg data.json`\n\nUsing `gcg -g <json file>` to generate a json file"
 )
 
 // CGO_ENABLED: 0
@@ -304,6 +304,26 @@ func renderContent(cfg config, gf goFile) {
 	return
 }
 
+func generateFile(filename string) error {
+	content := `{
+    "variable": {},
+    "files": [
+        {
+            "package": "write your package name here",
+            "output": "pkg.go",
+            "import": [],
+            "body": [
+                {
+                    "template": "template.tpl",
+                    "args": []
+				}
+			]
+		}
+    ]
+}`
+	return ioutil.WriteFile(filename, []byte(content), 0777)
+}
+
 func main() {
 	var inputFile string
 	switch len(os.Args) {
@@ -317,6 +337,14 @@ func main() {
 		} else if os.Args[1] == "-d" || os.Args[1] == "--debug" {
 			ffmt.P(readData(os.Args[2]))
 			exitWhenFalse(false, "\n")
+		} else if os.Args[1] == "-g" || os.Args[1] == "--generate" {
+			filename := "./data.json"
+			if len(os.Args) >= 3 {
+				filename = os.Args[2]
+			}
+			err := generateFile(filename)
+			exitWhenError(err)
+			exitWhenFalse(false, fmt.Sprintf("Generated json file %s", filename))
 		}
 		inputFile = os.Args[1]
 
